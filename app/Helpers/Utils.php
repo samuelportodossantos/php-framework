@@ -30,6 +30,22 @@ class Utils
             exit;
         }
     }
+
+    /**
+     * @param integer $code codigo de retorno, Ex: 200 para sucesso
+     * @param string $message mensagem de erro ou sucesso
+     * @param array $data dados de resposta ao retorno
+     * @return json parão de retorno da requisição
+     */
+    public static function apiReturn($code, $message, $dada)
+    {
+        $response = [
+            'code' => $code,
+            'message' => $message,
+            'data' => $dada
+        ];
+        self::json_dd($response, 'stop');
+    }
    
     public static function urlGetParams()
     {

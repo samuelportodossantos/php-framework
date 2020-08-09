@@ -1,7 +1,7 @@
 <?php
 
 class IndexController implements Controller {
-    public function index(){
-        var_dump($_SERVER);
+    public function index($request){
+        Utils::json_dd($request);
     }
 }

@@ -13,27 +13,54 @@ class Route
     public function run ()
     {
         if ( isset($this->routeList[$this->url]) ) {
-            $routeController = $this->routeList[$this->url];
+            $routeController = $this->routeList[$this->url]['name'];
             $controller = explode("@", $routeController)[0];
             $method = explode("@", $routeController);
             $method = array_pop($method);
 
             if ( class_exists($controller)  ) {
                 $routeClass = new $controller();
+                $request = $this->routeList[$this->url]['method'];
+                switch ($request) {
+                    case 'POST':
+                        $request = filter_input_array(INPUT_POST, FILTER_DEFAULT);
+                        break;
+                    case 'GET':
+                        $request = filter_input_array(INPUT_GET, FILTER_DEFAULT);
+                        break;
+                    default:
+                        $request = filter_input_array(INPUT_GET, FILTER_DEFAULT);
+                        break;
+                }
+
                 if ( method_exists($routeClass, $method) ) {
-                    $routeClass->$method();
+                    $routeClass->$method($request);
                 } else {
-                    $routeClass->index();
+                    $routeClass->index($request);
                 }
             }
 
         } else {
-            print "Error 404, route not found";
+            Utils::apiReturn(404, 'Route not found', []);
         }   
     }
 
-    public function add ($route, $routeName)
+    public function post($route, $routeName){
+        if ( $_SERVER['REQUEST_METHOD'] !== 'POST' ) {
+            Utils::apiReturn(405, 'Method not allowed', []);
+        }
+        $this->add($route, $routeName, 'POST');
+    }
+
+    public function get($route, $routeName){
+        if ( $_SERVER['REQUEST_METHOD'] !== 'GET' ) {
+            Utils::apiReturn(405, 'Method not allowed', []);
+        }
+        $this->add($route, $routeName, 'GET');
+    }
+
+    private function add ($route, $routeName, $method)
     {
-        $this->routeList[$route] = $routeName;
+        $this->routeList[$route] = ['name' => $routeName, 'method' => $method];
     }
 }

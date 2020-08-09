@@ -17,6 +17,7 @@ abstract class DB
         $this->user = USER;
         $this->pwrd = PWRD;
         $this->dbsa = DBSA;
+        $this->port = PORT;
 
         $this->setTableName($class);
         $this->getConnection();
@@ -56,7 +57,12 @@ abstract class DB
             $columns = "*";
         }
         $sql = "SELECT {$columns} FROM {$this->table} {$this->where} ORDER BY id DESC";
-        return $this->connection->query($sql)->fetch(PDO::FETCH_OBJ);
+
+        $return = $this->connection->query($sql);
+        if ( !$return ) {
+            return [];
+        }
+        return $return->fetch(PDO::FETCH_OBJ);
     }
 
     public function find ($id, $columns = null)
@@ -91,6 +97,7 @@ abstract class DB
         $columns = "(".implode(", ", array_keys($data)).")";
         $values  = "('".implode("', '", array_values($data))."')";
         $sql = "INSERT INTO {$this->table} {$columns} VALUES {$values}";
+        
         if ( $this->connection->query($sql) ) {
             $sql = "SELECT * FROM {$this->table} ORDER BY id DESC LIMIT 1";
             Utils::json_dd(['status'=>'success', 'message' => 'Registro finalizado com sucesso', 'content' => $this->connection->query($sql)->fetch(PDO::FETCH_ASSOC)]);
@@ -130,7 +137,7 @@ abstract class DB
     public function getConnection ()
     {
         if ( !$this->connection ) {
-            $this->connection = new PDO("mysql:host={$this->host};dbname={$this->dbsa}", $this->user, $this->pwrd);
+            $this->connection = new PDO("mysql:host={$this->host};port={$this->port}dbname={$this->dbsa}", $this->user, $this->pwrd);
         }
         return $this->connection;
     }
@@ -138,7 +145,7 @@ abstract class DB
     protected function setTableName ($class)
     {
         if ( $this->table == "") {
-            $this->table = strtolower($class).'s';
+            $this->table = $this->dbsa.'.'.strtolower($class).'s';
         }
     }
 

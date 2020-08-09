@@ -30,9 +30,7 @@ class Route
 
                 if ( $request != $_SERVER['REQUEST_METHOD'] ) {
                     Utils::apiReturn(405, 'Method not allowed', [
-                        'method' => $_SERVER['REQUEST_METHOD'],
-                        'request_url' => $_SERVER['SERVER_NAME'].'/'.$_SERVER['REQUEST_URI'],
-                        'line' => 53
+                        'method' => $_SERVER['REQUEST_METHOD']
                         ]);
                 }
 

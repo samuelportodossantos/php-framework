@@ -12,6 +12,10 @@ class Route
     
     public function run ()
     {
+
+        if ( !isset($_SERVER['HTTP_X_FORWARDED_PROTO']) || $_SERVER['HTTP_X_FORWARDED_PROTO'] != 'https' ) {
+            Utils::apiReturn(403, 'SSL required', []);
+        }
             
         if ( $this->routeList[$this->url] != null ) {
 

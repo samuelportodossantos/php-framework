@@ -1,0 +1,29 @@
+version: "3"
+services: 
+  api:
+    container_name: api_server
+    build: .
+    ports: 
+      - 8080:80
+      - 4443:443
+    volumes:
+      - .:/var/www/html
+    networks: 
+      - api-network
+  database:
+    container_name: db_server
+    image: mysql:5.7
+    ports:
+      - 33306:3306
+    volumes: 
+      - db-data:/var/lib/mysql
+    environment: 
+      - MYSQL_ROOT_PASSWORD=euvacopode
+      - MYSQL_DATABASE=api
+    networks: 
+      - api-network
+volumes: 
+  db-data:
+networks: 
+  api-network:
+    driver: bridge

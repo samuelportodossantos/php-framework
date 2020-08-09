@@ -1,5 +1,6 @@
 FROM php:7.4-apache
 RUN docker-php-ext-install pdo pdo_mysql
+RUN a2enmod rewrite
 
 # Instalando composer
 RUN cd ~; curl -sS https://getcomposer.org/installer -o composer-setup.php;php composer-setup.php --install-dir=/usr/local/bin --filename=composer

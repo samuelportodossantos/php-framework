@@ -17,15 +17,7 @@ foreach ($config as $key => $index) {
 # Realiza o autoload das classes
 spl_autoload_register(function($class){
 
-    $appFolders = [
-        "Models",
-        "Controllers",
-        "Helpers",
-        "Lib",
-        "Database"
-    ];
-
-    foreach ($appFolders as $folder) {
+    foreach (array_slice(scandir('app'), 2) as $folder) {
         $filePath = __DIR__. DIRECTORY_SEPARATOR ."app".DIRECTORY_SEPARATOR. $folder . DIRECTORY_SEPARATOR . $class .".php";
         if ( file_exists( $filePath ) ) {
             include $filePath;

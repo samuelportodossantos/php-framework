@@ -30,8 +30,7 @@ class Utils
             exit;
         }
     }
-
-    
+   
     public static function urlGetParams()
     {
         $uri = explode('?', $_SERVER['REQUEST_URI'])[1];

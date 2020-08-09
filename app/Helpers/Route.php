@@ -12,7 +12,9 @@ class Route
     
     public function run ()
     {
-        if ( isset($this->routeList[$this->url]) ) {
+            
+        if ( $this->routeList[$this->url] != null ) {
+
             $routeController = $this->routeList[$this->url]['name'];
             $controller = explode("@", $routeController)[0];
             $method = explode("@", $routeController);
@@ -21,22 +23,31 @@ class Route
             if ( class_exists($controller)  ) {
                 $routeClass = new $controller();
                 $request = $this->routeList[$this->url]['method'];
+
+                if ( $request != $_SERVER['REQUEST_METHOD'] ) {
+                    Utils::apiReturn(405, 'Method not allowed', [
+                        'method' => $_SERVER['REQUEST_METHOD'],
+                        'request_url' => $_SERVER['SERVER_NAME'].'/'.$_SERVER['REQUEST_URI'],
+                        'line' => 53
+                        ]);
+                }
+
                 switch ($request) {
                     case 'POST':
-                        $request = filter_input_array(INPUT_POST, FILTER_DEFAULT);
+                        $request_data = filter_input_array(INPUT_POST, FILTER_DEFAULT);
                         break;
                     case 'GET':
-                        $request = filter_input_array(INPUT_GET, FILTER_DEFAULT);
+                        $request_data = Utils::urlGetParams();
                         break;
                     default:
-                        $request = filter_input_array(INPUT_GET, FILTER_DEFAULT);
+                        $request_data = Utils::urlGetParams();
                         break;
                 }
 
                 if ( method_exists($routeClass, $method) ) {
-                    $routeClass->$method($request);
+                    $routeClass->$method($request_data);
                 } else {
-                    $routeClass->index($request);
+                    $routeClass->index($request_data);
                 }
             }
 
@@ -46,19 +57,13 @@ class Route
     }
 
     public function post($route, $routeName){
-        if ( $_SERVER['REQUEST_METHOD'] !== 'POST' ) {
-            Utils::apiReturn(405, 'Method not allowed', []);
-        }
         $this->add($route, $routeName, 'POST');
     }
 
     public function get($route, $routeName){
-        if ( $_SERVER['REQUEST_METHOD'] !== 'GET' ) {
-            Utils::apiReturn(405, 'Method not allowed', []);
-        }
         $this->add($route, $routeName, 'GET');
     }
-
+   
     private function add ($route, $routeName, $method)
     {
         $this->routeList[$route] = ['name' => $routeName, 'method' => $method];

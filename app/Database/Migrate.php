@@ -9,7 +9,7 @@ class Migrate extends DB {
 
     function __construct($table)
     {   
-        $this->table = $table;
+        $this->table = strtolower($table);
         parent::__construct($this->table);
     }
 

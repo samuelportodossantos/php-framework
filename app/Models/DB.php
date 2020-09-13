@@ -98,10 +98,7 @@ abstract class DB
         $values  = "('".implode("', '", array_values($data))."')";
         $sql = "INSERT INTO {$this->table} {$columns} VALUES {$values}";
         
-        if ( $this->connection->query($sql) ) {
-            $sql = "SELECT * FROM {$this->table} ORDER BY id DESC LIMIT 1";
-            Utils::json_dd(['status'=>'success', 'message' => 'Registro finalizado com sucesso', 'content' => $this->connection->query($sql)->fetch(PDO::FETCH_ASSOC)]);
-        } else {
+        if ( !$this->connection->query($sql) ) {
             Utils::json_dd(['status'=>'error', 'sql' => $sql]);
         }
     }
@@ -115,10 +112,8 @@ abstract class DB
         $sql_values = implode(", ", $sql_values);
         $sql = "UPDATE {$this->table} SET {$sql_values} WHERE id = {$id} LIMIT 1";
 
-        if ( $this->connection->query($sql) ) {
-            return json_encode(['status'=>'success']);
-        } else {
-            return json_encode(['status'=>'error']);
+        if ( !$this->connection->query($sql) ) {
+            Utils::json_dd(['status'=>'error', 'sql' => $sql]);
         }
     }
 
@@ -128,7 +123,6 @@ abstract class DB
         if ( $this->connection->query($sql)->fetch(PDO::FETCH_ASSOC) ) {
             $sql = "DELETE FROM {$this->table} WHERE id = '{$id}' LIMIT 1";
             $this->connection->query($sql);
-            Utils::json_dd(['status'=>'success', 'message' => 'Registro excluído com sucesso']);
         } else {
             Utils::json_dd(['status'=>'error', 'message' => 'Registro não encontrado']);
         }

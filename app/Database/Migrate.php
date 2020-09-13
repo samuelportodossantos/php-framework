@@ -37,9 +37,9 @@ class Migrate extends DB {
         $this->columns[] = "{$fieldName} INT NOT NULL PRIMARY KEY AUTO_INCREMENT";
     }
 
-    protected function integer($fieldName)
+    protected function integer($fieldName, $default = 11)
     {
-        $this->columns[] = "{$fieldName} INT(11)";
+        $this->columns[] = "{$fieldName} INT($default)";
     }
 
     protected function longtext($fieldName)
@@ -57,10 +57,9 @@ class Migrate extends DB {
         $this->columns[] = "{$fieldName} BOOLEAN";
     }
 
-    protected function varchar($fieldName, $amount = null)
+    protected function varchar($fieldName, $default = 255)
     {
-        $amount = $amount == null ? 255 : $amount;
-        $this->columns[] = "{$fieldName} VARCHAR({$amount})";
+        $this->columns[] = "{$fieldName} VARCHAR({$default})";
     }
 
     public function makeMigrations ()
@@ -69,7 +68,7 @@ class Migrate extends DB {
         $migrations = dir(__DIR__);
         while( $file = $migrations->read()) {
             if ( !in_array($file, $ignore) ) {
-                $class = explode('Migration.', $file)[0];
+                $class = strtolower(explode('Migration.', $file)[0]);
                 $mig = new Migration();
                 $mig->where('table_name', $class);
                 $res = $mig->get();
@@ -87,7 +86,7 @@ class Migrate extends DB {
                     }
                 }
                 if ($migrated == 0) {
-                    $class = "{$class}Migration";
+                    $class = ucfirst($class)."Migration";
                     (new $class);
                 }
             }

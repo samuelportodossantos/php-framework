@@ -3,22 +3,14 @@
 class IndexController implements Controller {
 
     public function index($request){
-        Utils::json_dd($request, 'stop');
-    }
 
-    public function login($request)
-    {
+        $data = [
+            "framework" => "GENS",
+            "meuNome" => "Samuel Porto"
+        ];
 
-        $Auth = new AuthService('samuelp','1234');
+        View::return("index", $data);
 
-        var_dump($Auth);
-        
-        Utils::json_dd($request, 'stop');
-    }
-
-    public function users($request)
-    {
-        Utils::json_dd($request, 'stop');
     }
 
 }

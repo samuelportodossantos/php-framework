@@ -51,7 +51,38 @@ class {$migrationName} extends Migrate {
 }";
 
                 file_put_contents("app/Database/{$migrationName}.php", $migration);
+            }
 
+            if ( $argv[2] == "controller" ) {
+                if ( !strpos($argv[3], "Controller") ) {
+                    print "A sintaxe do controller precisa ser 'NomeController'\n";
+                    exit;
+                }
+                $controllerName = $argv[3];
+
+                $controller = "<?php
+
+class {$controllerName} extends Controller {}";
+
+                file_put_contents("app/Controllers/{$controllerName}.php", $controller);
+
+            }
+
+
+            if ( $argv[2] == "model" ) {
+                
+                $modelName = $argv[3];
+
+                $controller = "<?php
+
+class {$modelName} extends DB {
+    function __construct()
+    {
+        parent::__construct(get_class());
+    }
+}";
+
+                file_put_contents("app/Models/{$modelName}.php", $controller);
             }
 
         }

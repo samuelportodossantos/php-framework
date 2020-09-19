@@ -19,6 +19,8 @@ class View {
       print "View não encontrada.";
     }
 
+    exit;
+
   } 
 
 }

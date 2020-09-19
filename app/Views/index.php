@@ -7,13 +7,7 @@
 </head>
 <body>
 
-  
-
-    
-<marquee behavior="" direction=""> 
   <h2>{{ title }}</h2>
-</marquee>
-  
   
 </body>
 </html>

@@ -8,15 +8,12 @@
 <body>
 
   
+
+    
+<marquee behavior="" direction=""> 
+  <h2>{{ title }}</h2>
+</marquee>
   
-    {{ meuNome }}
-
-    <br>
-
-    {{ framework }}
-
-
-  <h1>Bem vindo ao GENS Framework</h1>
   
 </body>
 </html>

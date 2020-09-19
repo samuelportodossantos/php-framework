@@ -75,18 +75,17 @@ abstract class DB
         $sql = "SELECT {$columns} FROM {$this->table} WHERE id = '{$id}' LIMIT 1";
         $objQuery = $this->connection->query($sql)->fetch(PDO::FETCH_ASSOC);
         if ( $objQuery ) {
-
-            return [
+            Utils::json_dd([
                 'status' => 'success',
                 'content' => $objQuery
-            ];
+            ]);
         }
 
-        return [
+        Utils::json_dd([
             'status' => 'warning',
             'message' => 'Nenhum resultado encontrado',
             'content' => []
-        ];
+        ]);
     }
 
     public function save ($data)
@@ -113,8 +112,13 @@ abstract class DB
         $sql = "UPDATE {$this->table} SET {$sql_values} WHERE id = {$id} LIMIT 1";
 
         if ( !$this->connection->query($sql) ) {
-            Utils::json_dd(['status'=>'error', 'sql' => $sql]);
+            Utils::json_dd(['status'=>'error', 'message' => 'Não foi possível atualizar as informações', 'sql' => $sql]);
         }
+
+        Utils::json_dd([
+            'status' => 'success',
+            'message' => 'Regitro atualizado com sucesso'
+        ]);
     }
 
     public function delete ($id)

@@ -62,7 +62,10 @@ class {$migrationName} extends Migrate {
 
                 $controller = "<?php
 
-class {$controllerName} extends Controller {}";
+class {$controllerName} implements Controller {
+
+    public function index(\$request) {}
+}";
 
                 file_put_contents("app/Controllers/{$controllerName}.php", $controller);
 

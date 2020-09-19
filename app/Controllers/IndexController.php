@@ -5,8 +5,7 @@ class IndexController implements Controller {
     public function index($request){
 
         $data = [
-            "framework" => "GENS",
-            "meuNome" => "Samuel Porto"
+            "title" => "Bem vindo ao Gens framework",
         ];
 
         View::return("index", $data);

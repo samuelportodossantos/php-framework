@@ -2,11 +2,24 @@
 
 class AuthController implements Controller {
 
+    function __construct()
+    {
+        
+       
+    }
+
     public function index($request)
     {}
 
-    public function login()
+    public function login($request)
     {
-        Utils::json_dd(["status" => "success", "content" => ["token" => null]]);
+
+        
+        
+        $auth = new AuthService($request['username'], $request['password']);
+        $auth->doAuth();
+
+        // Utils::json_dd(["status" => "success", "content" => ["token" => null]]);
     }
+
 }

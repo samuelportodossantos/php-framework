@@ -21,6 +21,10 @@ class Migrate extends DB {
 
     protected function run ()
     {
+        $this->columns[] = "created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP";
+        $this->columns[] = "updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP";
+        $this->columns[] = "deleted_at TIMESTAMP NULL";
+
         foreach($this->columns as $key => $column) {
             if ( $key >= count($this->columns) - 1 ) {
                 $this->fields .= $column;
@@ -29,6 +33,8 @@ class Migrate extends DB {
             }
         }
         $this->query .= "CREATE TABLE IF NOT EXISTS {$this->dbsa}.{$this->table} ($this->fields) CHARACTER SET utf8 DEFAULT COLLATE utf8_general_ci;";
+        
+ 
         $this->createTable();
     }
 
@@ -62,6 +68,12 @@ class Migrate extends DB {
         $this->columns[] = "{$fieldName} VARCHAR({$default})";
     }
 
+    protected function datetime($fieldName, $default = null)
+    {
+        $default = $default == null ? date("Y-m-d H:i:s") : $default;
+        $this->columns[] = "{$fieldName} DATETIME DEFAULT '{$default}'";
+    }
+
     public function makeMigrations ()
     {   
         $ignore = ['.', '..', 'Migrate.php', 'DefaultMigration.php'];
@@ -85,12 +97,18 @@ class Migrate extends DB {
                         $mig->update($res->id, ['migrated' => true]);
                     }
                 }
+
                 if ($migrated == 0) {
                     $class = ucfirst($class)."Migration";
                     (new $class);
                 }
             }
         }
+    }
+
+    public function getQuery()
+    {
+        return $this->query;
     }
 
 }

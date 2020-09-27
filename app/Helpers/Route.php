@@ -4,10 +4,12 @@ class Route
 {
     private $routeList = [];
     private $url = null;
+    private $headers = null;
 
     function __construct()
     {
         $this->url = isset($_GET['url']) ? "/{$_GET['url']}" : '/';
+        $this->headers = getallheaders();
     }
     
     public function run ()

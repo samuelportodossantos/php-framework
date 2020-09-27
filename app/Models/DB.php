@@ -26,16 +26,19 @@ abstract class DB
     public function where ($column, $value)
     {       
         $this->where = " WHERE $column = '$value'";
+        return $this;
     }
 
     public function andWhere ($column, $value)
     {       
         $this->where .= " AND $column = '$value'";
+        return $this;
     }
 
     public function orWhere ($column, $value)
     {       
         $this->where .= " OR $column = '$value'";
+        return $this;
     }
 
     public function all ($columns = null)
@@ -73,19 +76,7 @@ abstract class DB
             $columns = "*";
         }
         $sql = "SELECT {$columns} FROM {$this->table} WHERE id = '{$id}' LIMIT 1";
-        $objQuery = $this->connection->query($sql)->fetch(PDO::FETCH_ASSOC);
-        if ( $objQuery ) {
-            Utils::json_dd([
-                'status' => 'success',
-                'content' => $objQuery
-            ]);
-        }
-
-        Utils::json_dd([
-            'status' => 'warning',
-            'message' => 'Nenhum resultado encontrado',
-            'content' => []
-        ]);
+        return  $this->connection->query($sql)->fetch(PDO::FETCH_ASSOC);
     }
 
     public function save ($data)
@@ -98,8 +89,10 @@ abstract class DB
         $sql = "INSERT INTO {$this->table} {$columns} VALUES {$values}";
         
         if ( !$this->connection->query($sql) ) {
-            Utils::json_dd(['status'=>'error', 'sql' => $sql]);
+            return false;
         }
+
+        return $this->all();
     }
 
     public function update ($id, $data)
@@ -112,13 +105,9 @@ abstract class DB
         $sql = "UPDATE {$this->table} SET {$sql_values} WHERE id = {$id} LIMIT 1";
 
         if ( !$this->connection->query($sql) ) {
-            Utils::json_dd(['status'=>'error', 'message' => 'Não foi possível atualizar as informações', 'sql' => $sql]);
+            return false;
         }
-
-        Utils::json_dd([
-            'status' => 'success',
-            'message' => 'Regitro atualizado com sucesso'
-        ]);
+        return $this->all();
     }
 
     public function delete ($id)
@@ -126,9 +115,12 @@ abstract class DB
         $sql = "SELECT id FROM {$this->table} WHERE id = '{$id}' LIMIT 1";
         if ( $this->connection->query($sql)->fetch(PDO::FETCH_ASSOC) ) {
             $sql = "DELETE FROM {$this->table} WHERE id = '{$id}' LIMIT 1";
-            $this->connection->query($sql);
+            if ($this->connection->query($sql)) {
+                return $this->all();
+            }
+            return false;
         } else {
-            Utils::json_dd(['status'=>'error', 'message' => 'Registro não encontrado']);
+            return false;
         }
     }
 

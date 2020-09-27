@@ -8,8 +8,9 @@ class UsersMigration extends Migrate {
         parent::primary('id');
         parent::varchar('name');
         parent::varchar('email');
-        parent::varchar('password', 30);
+        parent::varchar('password');
         parent::varchar('access_token');
+        parent::datetime('expires_at');
         parent::run();
     }
 

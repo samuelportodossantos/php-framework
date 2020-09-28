@@ -1,40 +1,49 @@
 <?php
 
-class AuthService {
-  
+class AuthService
+{
+  private $userInfo = null;
   private $username;
   private $password;
   private $token;
 
-  /**
-   * @param String $username
-   * @param String $password
-   * @param String $token (Optional) if have token, dont need username and password
-   */
-  function __construct($username, $password, $token = null)
+
+  function __construct($exceptions = [])
   {
-    $this->username = str_replace(" ", "", strip_tags(trim($username)));
-    $this->password = str_replace(" ", "", strip_tags(trim($password)));
-    $this->token    = str_replace(" ", "", strip_tags(trim($token)));
+    $user = $_REQUEST['url'];
+    if (!in_array($user, $exceptions)) {
+      $this->token = str_replace('Bearer ', '', getallheaders()['Authorization']);
+      if ( !$this->verifyToken() ) {
+        Utils::apiReturn(200, "Token inválido", ['token' => $this->token]);
+      }
+
+      $this->userInfo = $this->userInfo == null ? (new User())
+        ->where('access_token', $this->token)
+        ->get(['id', 'name', 'email', 'expires_at', 'access_token']) : $this->userInfo;
+    }
   }
 
-  public function doAuth()
+  public function doAuth($username, $password)
   {
+
+    $this->username = str_replace(" ", "", strip_tags(trim($username)));
+    $this->password = str_replace(" ", "", strip_tags(trim($password)));
+
     $user = new User();
     $user = $user
       ->where("email", $this->username)
       ->get(['id', 'name', 'email', 'password']);
-    
-    if ( !$user ) {
+
+    if (!$user) {
       Utils::apiReturn(200, "Usuário não encontrado", ["username" => $this->username]);
     }
 
-    if ( password_verify($this->password, $user->password) ) {
+    if (password_verify($this->password, $user->password)) {
       unset($user->password);
 
       $token = Utils::generateJWT($this->username);
-      $token_expires_at = date('Y-m-d H:i:s', strtotime("+1 hours"));
-      
+      $token_expires_at = date('Y-m-d H:i:s', strtotime("+". SESSION_TIME ." hours"));
+
       (new User())->update($user->id, [
         'access_token' => $token,
         'expires_at' => $token_expires_at
@@ -47,21 +56,29 @@ class AuthService {
         'expires_at' => $token_expires_at
       ];
 
-      Utils::apiReturn(200, "Usuário encontrado", $return);
+      return $return;
     } else {
-      Utils::apiReturn(200, "Usuário não encontrado", ["username" => $this->username]);
+      return false;
     }
-    
+  }
+
+  public function verifyToken()
+  {
+    if ($this->token != null) {
+      $user = (new User())->where('access_token', $this->token)
+        ->get();
+      return $user;
+    }
+    return false;
+  }
+
+  public function setToken($token)
+  {
+    $this->token    = str_replace(" ", "", strip_tags(trim($token)));
   }
 
   public function getUserInfo()
   {
-
+    return $this->userInfo;
   }
-
-  public function renewTokenTime()
-  {
-    
-  }
-  
 }
